@@ -1,32 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MedTerm Easy Explainer</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-    h2 { color: #0056b3; }
-    input, textarea, button { width: 100%; margin-top: 10px; padding: 10px; box-sizing: border-box; }
-    button { background-color: #0056b3; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:hover { background-color: #003d80; }
-    #result { margin-top: 20px; padding: 15px; background: #f9f9f9; border-left: 4px solid #0056b3; min-height: 50px; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 25px;
+      background: #f4f9ff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #0056b3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 20px;
+      color: #1a2a3a;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #c0d4e8;
+      border-radius: 8px;
+      font-size: 15px;
+      background: white;
+    }
+    textarea { resize: vertical; }
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      background: #0056b3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #003d80;
+      transform: scale(1.01);
+    }
+    #result {
+      margin-top: 25px;
+      padding: 18px;
+      background: #ffffff;
+      border-left: 5px solid #0056b3;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      min-height: 70px;
+      white-space: pre-wrap;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .note {
+      font-size: 13px;
+      color: #4a5b6e;
+      margin-top: 8px;
+    }
+    .badge {
+      display: inline-block;
+      background: #d4e3fd;
+      color: #004080;
+      padding: 3px 12px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    hr {
+      margin: 30px 0 10px;
+      border: none;
+      border-top: 1px solid #d8e3f0;
+    }
   </style>
 </head>
 <body>
 
   <h2>🩺 MedTerm Easy Explainer</h2>
-  <p>Paste your Gemini API key and type a medical term/report to explain simply.</p>
+  <p style="color:#1f3a5f;">Paste your Gemini API key, then type any medical term or lab result — AI explains it in plain, patient-friendly English.</p>
 
-  <label for="apiKey"><strong>Gemini API Key:</strong></label>
-  <input type="password" id="apiKey" placeholder="Paste your AIzaSy... API Key here">
+  <label for="apiKey">🔑 Gemini API Key <span class="badge">required</span></label>
+  <input type="password" id="apiKey" placeholder="Paste your AIzaSy... API key here" />
 
-  <label for="userInput"><strong>Medical Term / Report Text:</strong></label>
-  <textarea id="userInput" rows="4" placeholder="e.g., Hyperkalemia or Hemoglobin 11.5 g/dL"></textarea>
+  <label for="userInput">📋 Medical Term or Lab Report</label>
+  <textarea id="userInput" rows="4" placeholder="Example: Hyperkalemia — OR — My hemoglobin is 11.5 g/dL, what does that mean?"></textarea>
 
-  <button onclick="explainTerm()">Explain Simply</button>
+  <button onclick="explainTerm()">🔍 Explain Like I'm 5</button>
 
-  <div id="result">Your simplified explanation will appear here...</div>
+  <div id="result">💡 Your simplified explanation will appear here...</div>
+
+  <hr />
+  <p class="note"><strong>⚡ How it works:</strong> Your API key stays in your browser. Nothing is stored. Powered by Gemini AI.</p>
 
   <script>
     async function explainTerm() {
@@ -35,15 +112,16 @@
       const resultDiv = document.getElementById('result');
 
       if (!apiKey) {
-        alert('Please enter your Gemini API Key!');
+        alert('Please enter your Gemini API Key.');
         return;
       }
       if (!text) {
-        alert('Please enter a medical term or lab report text!');
+        alert('Please enter a medical term or lab result.');
         return;
       }
 
-      resultDiv.innerText = 'Analyzing with Gemini AI... Please wait...';
+      resultDiv.innerText = '⏳ Thinking... Please wait a moment.';
+      resultDiv.style.color = '#1a2a3a';
 
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -54,7 +132,9 @@
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `You are a helpful medical assistant. Explain the following medical term or lab result in extremely simple, easy-to-understand language for a patient: "${text}"`
+                text: `You are a compassionate medical translator. Your job is to explain medical terms and lab results in extremely simple, clear, reassuring language — as if explaining to a patient with no medical background. Use everyday words, short sentences, and avoid fear.
+
+Medical text to explain: "${text}"`
               }]
             }]
           })
@@ -62,13 +142,17 @@
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          resultDiv.innerText = data.candidates[0].content.parts[0].text;
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          const reply = data.candidates[0].content.parts[0].text;
+          resultDiv.innerText = reply;
+          resultDiv.style.color = '#0b1f33';
         } else {
-          resultDiv.innerText = 'Error processing request. Please check your API key.';
+          resultDiv.innerText = '❌ Error: Could not get a response. Check your API key or try again.';
+          resultDiv.style.color = '#b22222';
         }
       } catch (error) {
-        resultDiv.innerText = 'Network error or invalid API key request.';
+        resultDiv.innerText = '🌐 Network error. Please check your internet connection and API key.';
+        resultDiv.style.color = '#b22222';
       }
     }
   </script>
